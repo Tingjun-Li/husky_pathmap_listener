@@ -62,7 +62,7 @@ int main(int argc, char **argv)
   std::ofstream tum_outfile(file_name_tum);
   kitti_outfile.close();
   tum_outfile.close();
-
+  std::cout << "Ready to subscribe to path_map topic" << std::endl;
   ros::Subscriber sub = n.subscribe("zed_node/path_map", 1000, pathMapCallback);
 
   ros::spin();
