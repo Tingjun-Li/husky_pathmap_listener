@@ -11,10 +11,11 @@
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/PoseStamped.h>
+#include "nav_msgs/Odometry.h"
 #include <nav_msgs/Path.h>
 
-std::string file_name_kitti = "path_kitti";
-std::string file_name_tum = "path_tum";
+std::string file_name_kitti = "path_kitti.txt";
+std::string file_name_tum = "path_tum.txt";
 typedef std::numeric_limits< double > dbl;
 
 void savePoseCallback(const geometry_msgs::Pose& pose, const long double timestamp);
@@ -29,6 +30,19 @@ void pathMapCallback(const nav_msgs::Path::ConstPtr& msg)
   ROS_INFO("I heard: [%f, %f, %f]", position.x, position.y, position.z);
   long double timestamp;
   timestamp = msg->header.stamp.sec + (double)msg->header.stamp.nsec / (double)1000000000;
+  savePoseCallback(pose, timestamp);
+}
+
+void cameraOdomCallback(const nav_msgs::Odometry& msg)
+{
+  geometry_msgs::Pose pose;
+  pose = msg.pose.pose;
+  geometry_msgs::Point position;
+  position = pose.position;
+
+  ROS_INFO("I heard: [%f, %f, %f]", position.x, position.y, position.z);
+  long double timestamp;
+  timestamp = msg.header.stamp.sec + (double)msg.header.stamp.nsec / (double)1000000000;
   savePoseCallback(pose, timestamp);
 }
 
@@ -64,7 +78,8 @@ int main(int argc, char **argv)
   tum_outfile.close();
   std::cout << "Ready to subscribe to path_map topic" << std::endl;
   ros::Subscriber sub = n.subscribe("zed_node/path_map", 1000, pathMapCallback);
-
+  // ros::Subscriber sub = n.subscribe("zed_node/odom", 1000, cameraOdomCallback);
+  
   ros::spin();
 
   return 0;
